@@ -75,6 +75,61 @@ module.exports = class extends Generator {
       replace: false,
       values: [props.namespace + ":" + props.load]
     };
+    const gapplerecipe = {
+      type: "minecraft:crafting_shaped",
+      pattern: ["GGG", "GAG", "GGG"],
+      key: {
+        G: {
+          item: "minecraft:gold_block"
+        },
+        A: {
+          item: "minecraft:apple"
+        }
+      },
+      result: {
+        item: "minecraft:enchanted_golden_apple",
+        count: 1
+      }
+    };
+    const grass_path_lootTable = {
+      type: "minecraft:block",
+      pools: [
+        {
+          rolls: 1,
+          entries: [
+            {
+              type: "minecraft:alternatives",
+              children: [
+                {
+                  type: "minecraft:item",
+                  conditions: [
+                    {
+                      condition: "minecraft:match_tool",
+                      predicate: {
+                        enchantments: [
+                          {
+                            enchantment: "minecraft:silk_touch",
+                            levels: {
+                              max: 1
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  name: "minecraft:grass_path"
+                },
+                {
+                  type: "minecraft:item",
+                  name: "minecraft:dirt"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
     this.fs.writeJSON(this.destinationPath("pack.mcmeta"), { pack: pack });
     this.fs.writeJSON(
       this.destinationPath("data/minecraft/tags/functions/load.json"),
@@ -86,7 +141,7 @@ module.exports = class extends Generator {
     );
     this.fs.write(
       this.destinationPath(
-        "data/" + props.name + "/functions/" + props.load + ".mcfunction"
+        "data/" + props.namespace + "/functions/" + props.load + ".mcfunction"
       ),
       "# Insert your commands here - This will be called on a world load/reload\n\nsay The " +
         props.name +
@@ -94,9 +149,19 @@ module.exports = class extends Generator {
     );
     this.fs.write(
       this.destinationPath(
-        "data/" + props.name + "/functions/" + props.main + ".mcfunction"
+        "data/" + props.namespace + "/functions/" + props.main + ".mcfunction"
       ),
       "# Insert your commands here - This will be called every tick (20 time a second)\n"
+    );
+    this.fs.writeJSON(
+      this.destinationPath(
+        "data/" + props.namespace + "/recipes/gapplerecipe.json"
+      ),
+      gapplerecipe
+    );
+    this.fs.writeJSON(
+      this.destinationPath("data/minecraft/loot_tables/blocks/grass_path.json"),
+      grass_path_lootTable
     );
   }
 
